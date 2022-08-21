@@ -2,35 +2,41 @@ package org.example.helpers;
 
 import com.github.javafaker.Faker;
 import org.example.pojo.orders.IngredientsResponse;
-import org.example.pojo.orders.nested_classes.Data;
 import org.example.pojo.orders.OrderRequest;
+import org.example.pojo.orders.nested_classes.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
+import static org.example.helpers.UrlAndSpec.*;
 
-public class OrderGenerator extends AbstractHelpers{
-    private static final Faker FAKER = new Faker();
+public class OrderGenerator {
+    private final Faker faker = new Faker();
 
-    public static OrderRequest generateOrderWithRandomIngredient() {
+    public OrderRequest generateOrderWithRandomIngredient() {
         List<String> ingredients = given()
-                .baseUri(BASE_URI)
-                .get("/api/ingredients")
+                .spec(REQUEST_SPECIFICATION)
+                .get(INGREDIENTS_PATH)
                 .then()
                 .extract()
                 .body()
                 .as(IngredientsResponse.class).getData().stream()
                 .map(Data::get_id)
                 .collect(Collectors.toList());
-        return new OrderRequest(List.of(ingredients.get(FAKER.number().numberBetween(0, ingredients.size() - 1))));
+        return OrderRequest.builder()
+                .ingredients(List.of(ingredients.get(faker.number().numberBetween(0, ingredients.size() - 1)))).build();
     }
 
-    public static OrderRequest generateOrderWithoutIngredients() {
-        return new OrderRequest(List.of());
+    public OrderRequest generateOrderWithoutIngredients() {
+        return OrderRequest.builder()
+                .ingredients(List.of()).
+                build();
     }
 
-    public static OrderRequest generateOrderWithInvalidIngredientHash() {
-        return new OrderRequest(List.of(FAKER.bothify("#?#?#?")));
+    public OrderRequest generateOrderWithInvalidIngredientHash() {
+        return OrderRequest.builder()
+                .ingredients(List.of(faker.bothify("#?#?#?")))
+                .build();
     }
 }

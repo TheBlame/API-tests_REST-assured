@@ -5,49 +5,64 @@ import org.example.pojo.auth.AuthResponse;
 import org.example.pojo.orders.OrderRequest;
 
 import static io.restassured.RestAssured.given;
+import static org.example.helpers.UrlAndSpec.*;
 
-public class Utils extends AbstractHelpers {
-    public static void deleteUser(String token) {
-        given()
-                .baseUri(BASE_URI)
-                .auth()
-                .oauth2(token)
-                .delete("/api/auth/user");
+public class Utils {
+    public void deleteUser(String token) {
+        if (token != null) {
+            given()
+                    .spec(REQUEST_SPECIFICATION)
+                    .auth()
+                    .oauth2(token)
+                    .delete(USER_PATH);
+        }
     }
 
-    public static String getAccessToken(AuthRequest request) {
+    public String getAccessToken(AuthRequest request) {
         String token = given()
                 .spec(REQUEST_SPECIFICATION)
                 .body(getLoginCredentials(request))
-                .post("/api/auth/login")
+                .post(LOGIN_PATH)
                 .as(AuthResponse.class)
                 .getAccessToken();
-        return token.substring(7);
+        if (token != null) {
+            return token.substring(7);
+        } else {
+            return null;
+        }
     }
 
-    public static AuthRequest getLoginCredentials(AuthRequest request) {
-        return new AuthRequest(request.getEmail(), null, request.getPassword());
+    public AuthRequest getLoginCredentials(AuthRequest request) {
+        return AuthRequest.builder()
+                .email(request.getEmail())
+                .name(null)
+                .password(request.getPassword())
+                .build();
     }
 
-    public static void registerUser(AuthRequest request) {
+    public void registerUser(AuthRequest request) {
         given()
                 .spec(REQUEST_SPECIFICATION)
                 .body(request)
                 .when()
-                .post("/api/auth/register");
+                .post(REGISTER_PATH);
     }
 
-    public static AuthRequest changeUserCredentials(String newEmail, String newName, String newPassword) {
-        return new AuthRequest(newEmail, newName, newPassword);
+    public AuthRequest changeUserCredentials(String newEmail, String newName, String newPassword) {
+        return AuthRequest.builder()
+                .email(newEmail)
+                .name(newName)
+                .password(newPassword)
+                .build();
     }
 
-    public static int createOrder(OrderRequest request, String token, int numberOfOrders) {
+    public int createOrder(OrderRequest request, String token, int numberOfOrders) {
         given()
                 .spec(REQUEST_SPECIFICATION)
                 .auth()
                 .oauth2(token)
                 .body(request)
-                .post("/api/orders");
+                .post(ORDERS_PATH);
         return ++numberOfOrders;
     }
 }

@@ -1,26 +1,25 @@
 package org.example.steps.auth.user;
 
-import com.github.javafaker.Faker;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.example.pojo.auth.AuthRequest;
-import org.junit.*;
+import org.example.steps.AbstractTest;
+import org.example.steps.steps.AuthSteps;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import static org.apache.http.HttpStatus.*;
-import static org.example.helpers.UserGenerator.*;
-import static org.example.helpers.Utils.*;
-import static org.example.steps.steps.AuthSteps.*;
 
 @RunWith(Parameterized.class)
-public class ChangeUserDataParameterizedTest {
-    private static final String BASE_PATH = "/api/auth/user";
-    private static final Faker FAKER = new Faker();
+public class ChangeUserDataParameterizedTest extends AbstractTest {
     private static final String CHANGED_NAME = FAKER.name().username();
     private static final String CHANGED_EMAIL = FAKER.internet().emailAddress();
     private static final String CHANGED_PASSWORD = FAKER.bothify("#?#?#?");
-    private static final AuthRequest TEST_USER = generateUser();
+    private static final AuthRequest TEST_USER = USER_GENERATOR.generateUser();
+    private final AuthSteps step = new AuthSteps();
     private static String testUserToken;
 
     private final AuthRequest request;
@@ -36,32 +35,32 @@ public class ChangeUserDataParameterizedTest {
     @Parameterized.Parameters(name = "Test data: {0}")
     public static Object[][] getTestData() {
         return new Object[][] {
-                {"Change user email", changeUserCredentials(CHANGED_EMAIL, null, null),
+                {"Change user email", UTILS.changeUserCredentials(CHANGED_EMAIL, null, null),
                         CHANGED_EMAIL, TEST_USER.getName()},
-                {"Change user name", changeUserCredentials(null, CHANGED_NAME, null),
+                {"Change user name", UTILS.changeUserCredentials(null, CHANGED_NAME, null),
                         CHANGED_EMAIL, CHANGED_NAME},
-                {"Change user password", changeUserCredentials(null, null, CHANGED_PASSWORD),
+                {"Change user password", UTILS.changeUserCredentials(null, null, CHANGED_PASSWORD),
                         CHANGED_EMAIL, CHANGED_NAME}
         };
     }
 
     @BeforeClass
     public static void setUp() {
-        registerUser(TEST_USER);
-        testUserToken = getAccessToken(TEST_USER);
+        UTILS.registerUser(TEST_USER);
+        testUserToken = UTILS.getAccessToken(TEST_USER);
     }
 
     @AfterClass
     public static void clean() {
-        deleteUser(testUserToken);
+        UTILS.deleteUser(testUserToken);
     }
 
     @Test
     @DisplayName("Change authorized user data")
     public void changeUserData() {
-        Response response = sendPatchRequest(request, BASE_PATH, testUserToken);
-        checkStatusCode(response, SC_OK);
-        checkSuccess(response, true);
-        checkUser(response, expectedEmail, expectedName);
+        Response response = step.sendPatchToUserPath(request, testUserToken);
+        step.checkStatusCode(response, SC_OK);
+        step.checkSuccess(response, true);
+        step.checkUser(response, expectedEmail, expectedName);
     }
 }

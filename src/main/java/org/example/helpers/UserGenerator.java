@@ -4,47 +4,71 @@ import com.github.javafaker.Faker;
 import org.example.pojo.auth.AuthRequest;
 
 public class UserGenerator {
-    private static final Faker FAKER = new Faker();
+    private final Faker faker = new Faker();
 
-    public static AuthRequest generateUser() {
-        return new AuthRequest(FAKER.internet().emailAddress(), FAKER.name().username(), FAKER.bothify("#?#?#?"));
+    public AuthRequest generateUser() {
+        return AuthRequest.builder()
+                .email(faker.internet().emailAddress())
+                .name(faker.name().username())
+                .password(faker.bothify("#?#?#?"))
+                .build();
     }
 
-    public static AuthRequest generateUserWithoutEmail() {
-        return new AuthRequest(null, FAKER.name().username(), FAKER.bothify("#?#?#?"));
+    public AuthRequest generateUserWithoutEmail() {
+        return AuthRequest.builder()
+                .email(null)
+                .name(faker.name().username())
+                .password(faker.bothify("#?#?#?"))
+                .build();
     }
 
-    public static AuthRequest generateUserWithoutPassword() {
-        return new AuthRequest(FAKER.internet().emailAddress(), null, FAKER.bothify("#?#?#?"));
+    public AuthRequest generateUserWithoutPassword() {
+        return AuthRequest.builder()
+                .email(faker.internet().emailAddress())
+                .name(null)
+                .password(faker.bothify("#?#?#?"))
+                .build();
     }
 
-    public static AuthRequest generateUserWithoutName() {
-        return new AuthRequest(FAKER.internet().emailAddress(), FAKER.name().username(), null);
+    public AuthRequest generateUserWithoutName() {
+        return AuthRequest.builder()
+                .email(faker.internet().emailAddress())
+                .name(faker.name().username())
+                .password(null)
+                .build();
     }
 
-    public static AuthRequest generateCredentialsWithWrongEmail(AuthRequest request) {
+    public AuthRequest generateCredentialsWithWrongEmail(AuthRequest request) {
         String email = request.getEmail();
         boolean equal = true;
         while (equal) {
             if (email.equals(request.getEmail())) {
-                email = FAKER.internet().emailAddress();
+                email = faker.internet().emailAddress();
             } else {
                 equal = false;
             }
         }
-        return new AuthRequest(email, null, request.getPassword());
+        return AuthRequest.builder()
+                .email(email)
+                .name(null)
+                .password(request.getPassword())
+                .build();
     }
 
-    public static AuthRequest generateCredentialsWithWrongPassword(AuthRequest request) {
+    public AuthRequest generateCredentialsWithWrongPassword(AuthRequest request) {
         String password = request.getPassword();
         boolean equal = true;
         while (equal) {
             if (password.equals(request.getPassword())) {
-                password = FAKER.bothify("#?#?#?");
+                password = faker.bothify("#?#?#?");
             } else {
                 equal = false;
             }
         }
-        return new AuthRequest(request.getEmail(), null, password);
+        return AuthRequest.builder()
+                .email(request.getEmail())
+                .name(null)
+                .password(password)
+                .build();
     }
 }
