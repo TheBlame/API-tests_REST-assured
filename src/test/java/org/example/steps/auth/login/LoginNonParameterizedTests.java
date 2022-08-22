@@ -11,26 +11,27 @@ import org.junit.Test;
 import static org.apache.http.HttpStatus.*;
 
 public class LoginNonParameterizedTests extends AbstractTest {
-    private static final AuthRequest USER = USER_GENERATOR.generateUser();
+    private static AuthRequest user;
 
     @BeforeClass
     public static void setUp() {
-        UTILS.registerUser(USER);
+        user = userGenerator.generateUser();
+        authStep.registerUser(user);
     }
 
     @AfterClass
     public static void clean() {
-        UTILS.deleteUser(UTILS.getAccessToken(USER));
+        authStep.deleteUser(userGenerator.getAccessToken(user));
     }
 
     @Test
     @DisplayName("Login with valid credentials")
     public void loginWithValidCredentials() {
-        Response response = AUTH_STEP.sentPostToLoginPath(UTILS.getLoginCredentials(USER));
-        AUTH_STEP.checkStatusCode(response, SC_OK);
-        AUTH_STEP.checkSuccess(response, true);
-        AUTH_STEP.checkAccessToken(response);
-        AUTH_STEP.checkRefreshToken(response);
-        AUTH_STEP.checkUser(response, USER.getEmail(), USER.getName());
+        Response response = authStep.sentPostToLoginPath(userGenerator.getLoginCredentials(user));
+        authStep.checkStatusCode(response, SC_OK);
+        authStep.checkSuccess(response, true);
+        authStep.checkAccessToken(response);
+        authStep.checkRefreshToken(response);
+        authStep.checkUser(response, user.getEmail(), user.getName());
     }
 }

@@ -15,7 +15,7 @@ import static org.apache.http.HttpStatus.*;
 @RunWith(Parameterized.class)
 public class LoginParameterizedTests extends AbstractTest {
     private static final String INVALID_REQUEST_MESSAGE = "email or password are incorrect";
-    private static final AuthRequest USER = USER_GENERATOR.generateUser();
+    private static final AuthRequest user = userGenerator.generateUser();
 
     private final AuthRequest request;
 
@@ -26,27 +26,27 @@ public class LoginParameterizedTests extends AbstractTest {
     @Parameterized.Parameters(name = "Test data: {0}")
     public static Object[][] getTestData() {
         return new Object[][] {
-                {"Login with wrong email", USER_GENERATOR.generateCredentialsWithWrongEmail(USER)},
-                {"Login with wrong password", USER_GENERATOR.generateCredentialsWithWrongPassword(USER)}
+                {"Login with wrong email", userGenerator.generateCredentialsWithWrongEmail(user)},
+                {"Login with wrong password", userGenerator.generateCredentialsWithWrongPassword(user)}
         };
     }
 
     @BeforeClass
     public static void setUp() {
-        UTILS.registerUser(USER);
+        authStep.registerUser(user);
     }
 
     @AfterClass
     public static void clean() {
-        UTILS.deleteUser(UTILS.getAccessToken(USER));
+        authStep.deleteUser(userGenerator.getAccessToken(user));
     }
 
     @Test
     @DisplayName("Login with invalid credentials")
     public void loginWithInvalidCredentials() {
-        Response response = AUTH_STEP.sentPostToLoginPath(request);
-        AUTH_STEP.checkStatusCode(response, SC_UNAUTHORIZED);
-        AUTH_STEP.checkSuccess(response, false);
-        AUTH_STEP.checkMessage(response, INVALID_REQUEST_MESSAGE);
+        Response response = authStep.sentPostToLoginPath(request);
+        authStep.checkStatusCode(response, SC_UNAUTHORIZED);
+        authStep.checkSuccess(response, false);
+        authStep.checkMessage(response, INVALID_REQUEST_MESSAGE);
     }
 }

@@ -16,32 +16,32 @@ public class RegisterUserNonParameterizedTests extends AbstractTest {
 
     @Before
     public void setUp() {
-        request = USER_GENERATOR.generateUser();
+        request = userGenerator.generateUser();
     }
 
     @After
     public void clean() {
-        UTILS.deleteUser(UTILS.getAccessToken(request));
+        authStep.deleteUser(userGenerator.getAccessToken(request));
     }
 
     @Test
     @DisplayName("Registering valid user")
     public void registerValidUser() {
-        Response response = AUTH_STEP.sentPostToRegisterPath(request);
-        AUTH_STEP.checkStatusCode(response, SC_OK);
-        AUTH_STEP.checkSuccess(response, true);
-        AUTH_STEP.checkUser(response, request.getEmail(), request.getName());
-        AUTH_STEP.checkAccessToken(response);
-        AUTH_STEP.checkRefreshToken(response);
+        Response response = authStep.sentPostToRegisterPath(request);
+        authStep.checkStatusCode(response, SC_OK);
+        authStep.checkSuccess(response, true);
+        authStep.checkUser(response, request.getEmail(), request.getName());
+        authStep.checkAccessToken(response);
+        authStep.checkRefreshToken(response);
     }
 
     @Test
     @DisplayName("Registering an existing user")
     public void registerDuplicateUser() {
-        UTILS.registerUser(request);
-        Response response = AUTH_STEP.sentPostToRegisterPath(request);
-        AUTH_STEP.checkStatusCode(response, SC_FORBIDDEN);
-        AUTH_STEP.checkSuccess(response, false);
-        AUTH_STEP.checkMessage(response, DUPLICATE_USER_MESSAGE);
+        authStep.registerUser(request);
+        Response response = authStep.sentPostToRegisterPath(request);
+        authStep.checkStatusCode(response, SC_FORBIDDEN);
+        authStep.checkSuccess(response, false);
+        authStep.checkMessage(response, DUPLICATE_USER_MESSAGE);
     }
 }

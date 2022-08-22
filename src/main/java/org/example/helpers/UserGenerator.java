@@ -2,6 +2,11 @@ package org.example.helpers;
 
 import com.github.javafaker.Faker;
 import org.example.pojo.auth.AuthRequest;
+import org.example.pojo.auth.AuthResponse;
+
+import static io.restassured.RestAssured.given;
+import static org.example.helpers.UrlAndSpec.LOGIN_PATH;
+import static org.example.helpers.UrlAndSpec.REQUEST_SPECIFICATION;
 
 public class UserGenerator {
     private final Faker faker = new Faker();
@@ -70,5 +75,35 @@ public class UserGenerator {
                 .name(null)
                 .password(password)
                 .build();
+    }
+
+    public AuthRequest changeUserCredentials(String newEmail, String newName, String newPassword) {
+        return AuthRequest.builder()
+                .email(newEmail)
+                .name(newName)
+                .password(newPassword)
+                .build();
+    }
+
+    public AuthRequest getLoginCredentials(AuthRequest request) {
+        return AuthRequest.builder()
+                .email(request.getEmail())
+                .name(null)
+                .password(request.getPassword())
+                .build();
+    }
+
+    public String getAccessToken(AuthRequest request) {
+        String token = given()
+                .spec(REQUEST_SPECIFICATION)
+                .body(getLoginCredentials(request))
+                .post(LOGIN_PATH)
+                .as(AuthResponse.class)
+                .getAccessToken();
+        if (token != null) {
+            return token.substring(7);
+        } else {
+            return null;
+        }
     }
 }

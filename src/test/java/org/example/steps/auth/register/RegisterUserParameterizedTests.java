@@ -24,23 +24,23 @@ public class RegisterUserParameterizedTests extends AbstractTest {
     @Parameterized.Parameters(name = "Test data: {0}")
     public static Object[][] getTestData() {
         return new Object[][]{
-                {"User without name", USER_GENERATOR.generateUserWithoutName()},
-                {"User without password", USER_GENERATOR.generateUserWithoutPassword()},
-                {"User without email", USER_GENERATOR.generateUserWithoutEmail()}
+                {"User without name", userGenerator.generateUserWithoutName()},
+                {"User without password", userGenerator.generateUserWithoutPassword()},
+                {"User without email", userGenerator.generateUserWithoutEmail()}
         };
     }
 
     @After
     public void clean() {
-        UTILS.deleteUser(UTILS.getAccessToken(request));
+        authStep.deleteUser(userGenerator.getAccessToken(request));
     }
 
     @Test
     @DisplayName("Register user with invalid request")
     public void registerUserWithInvalidRequest() {
-        Response response = AUTH_STEP.sentPostToRegisterPath(request);
-        AUTH_STEP.checkStatusCode(response, SC_FORBIDDEN);
-        AUTH_STEP.checkSuccess(response, false);
-        AUTH_STEP.checkMessage(response, INVALID_REQUEST_MESSAGE);
+        Response response = authStep.sentPostToRegisterPath(request);
+        authStep.checkStatusCode(response, SC_FORBIDDEN);
+        authStep.checkSuccess(response, false);
+        authStep.checkMessage(response, INVALID_REQUEST_MESSAGE);
     }
 }

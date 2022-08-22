@@ -10,6 +10,7 @@ import static org.example.helpers.UrlAndSpec.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.apache.http.HttpStatus.*;
 
 public class OrdersSteps {
 
@@ -90,5 +91,18 @@ public class OrdersSteps {
     public void checkOwner(Response response, String expectedEmail, String expectedName) {
         assertThat(response.as(OrdersResponse.class).getOrder().getOwner().getEmail(), equalTo(expectedEmail));
         assertThat(response.as(OrdersResponse.class).getOrder().getOwner().getName(), equalTo(expectedName));
+    }
+
+    @Step("Create order")
+    public int createOrder(OrderRequest request, String token, int numberOfOrders) {
+        given()
+                .spec(REQUEST_SPECIFICATION)
+                .auth()
+                .oauth2(token)
+                .body(request)
+                .post(ORDERS_PATH)
+                .then()
+                .statusCode(SC_OK);
+        return ++numberOfOrders;
     }
 }

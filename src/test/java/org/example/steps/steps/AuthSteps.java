@@ -11,6 +11,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.apache.http.HttpStatus.*;
 
 public class AuthSteps {
     private static final String ACCESS_TOKEN_PATTER = "^Bearer\\s.+$";
@@ -77,5 +78,29 @@ public class AuthSteps {
     @Step("Check that body returns refreshToken")
     public void checkRefreshToken(Response response) {
         assertThat(response.as(AuthResponse.class).getRefreshToken(), notNullValue());
+    }
+
+    @Step("Delete user")
+    public void deleteUser(String token) {
+        if (token != null) {
+            given()
+                    .spec(REQUEST_SPECIFICATION)
+                    .auth()
+                    .oauth2(token)
+                    .delete(USER_PATH)
+                    .then()
+                    .statusCode(SC_ACCEPTED);
+        }
+    }
+
+    @Step("Register user")
+    public void registerUser(AuthRequest request) {
+        given()
+                .spec(REQUEST_SPECIFICATION)
+                .body(request)
+                .when()
+                .post(REGISTER_PATH)
+                .then()
+                .statusCode(SC_OK);
     }
 }

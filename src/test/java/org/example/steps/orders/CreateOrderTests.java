@@ -13,58 +13,60 @@ import static org.apache.http.HttpStatus.*;
 
 public class CreateOrderTests extends AbstractTest {
     private static final String NO_INGREDIENTS_MESSAGE = "Ingredient ids must be provided";
-    private static final AuthRequest TEST_USER = USER_GENERATOR.generateUser();
-    private final OrderRequest validRequest = ORDER_GENERATOR.generateOrderWithRandomIngredient();
+    private static AuthRequest testUser;
+    private static OrderRequest validRequest;
     private static String testUserToken;
     private OrderRequest invalidRequest;
 
     @BeforeClass
     public static void setUp() {
-        UTILS.registerUser(TEST_USER);
-        testUserToken = UTILS.getAccessToken(TEST_USER);
+        testUser = userGenerator.generateUser();
+        validRequest = orderGenerator.generateOrderWithRandomIngredient();
+        authStep.registerUser(testUser);
+        testUserToken = userGenerator.getAccessToken(testUser);
     }
 
     @AfterClass
     public static void clean() {
-        UTILS.deleteUser(testUserToken);
+        authStep.deleteUser(testUserToken);
     }
 
     @Test
     @DisplayName("Create valid order without authorization")
     public void createOrderWithoutAuthorization() {
-        Response response = ORDERS_STEP.sendPostRequest(validRequest, null);
-        ORDERS_STEP.checkStatusCode(response, SC_OK);
-        ORDERS_STEP.checkSuccess(response, true);
-        ORDERS_STEP.checkNameNotNull(response);
-        ORDERS_STEP.checkOrderNumber(response, validRequest.getIngredients().get(0));
+        Response response = ordersStep.sendPostRequest(validRequest, null);
+        ordersStep.checkStatusCode(response, SC_OK);
+        ordersStep.checkSuccess(response, true);
+        ordersStep.checkNameNotNull(response);
+        ordersStep.checkOrderNumber(response, validRequest.getIngredients().get(0));
     }
 
     @Test
     @DisplayName("Create valid order with authorization")
     public void createOrderWithAuthorization() {
-        Response response = ORDERS_STEP.sendPostRequest(validRequest, testUserToken);
-        ORDERS_STEP.checkStatusCode(response, SC_OK);
-        ORDERS_STEP.checkSuccess(response, true);
-        ORDERS_STEP.checkNameNotNull(response);
-        ORDERS_STEP.checkOrderNumber(response, validRequest.getIngredients().get(0));
-        ORDERS_STEP.checkOwner(response, TEST_USER.getEmail(), TEST_USER.getName());
+        Response response = ordersStep.sendPostRequest(validRequest, testUserToken);
+        ordersStep.checkStatusCode(response, SC_OK);
+        ordersStep.checkSuccess(response, true);
+        ordersStep.checkNameNotNull(response);
+        ordersStep.checkOrderNumber(response, validRequest.getIngredients().get(0));
+        ordersStep.checkOwner(response, testUser.getEmail(), testUser.getName());
     }
 
     @Test
     @DisplayName("Create order without ingredients")
     public void createOrderWithoutIngredients() {
-        invalidRequest = ORDER_GENERATOR.generateOrderWithoutIngredients();
-        Response response = ORDERS_STEP.sendPostRequest(invalidRequest, null);
-        ORDERS_STEP.checkStatusCode(response, SC_BAD_REQUEST);
-        ORDERS_STEP.checkSuccess(response, false);
-        ORDERS_STEP.checkMessage(response, NO_INGREDIENTS_MESSAGE);
+        invalidRequest = orderGenerator.generateOrderWithoutIngredients();
+        Response response = ordersStep.sendPostRequest(invalidRequest, null);
+        ordersStep.checkStatusCode(response, SC_BAD_REQUEST);
+        ordersStep.checkSuccess(response, false);
+        ordersStep.checkMessage(response, NO_INGREDIENTS_MESSAGE);
     }
 
     @Test
     @DisplayName("Create order with invalid ingredient hash")
     public void createOrderWithInvalidIngredient() {
-        invalidRequest = ORDER_GENERATOR.generateOrderWithInvalidIngredientHash();
-        Response response = ORDERS_STEP.sendPostRequest(invalidRequest, null);
-        ORDERS_STEP.checkStatusCode(response, SC_INTERNAL_SERVER_ERROR);
+        invalidRequest = orderGenerator.generateOrderWithInvalidIngredientHash();
+        Response response = ordersStep.sendPostRequest(invalidRequest, null);
+        ordersStep.checkStatusCode(response, SC_INTERNAL_SERVER_ERROR);
     }
 }
