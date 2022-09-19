@@ -1,9 +1,9 @@
-package org.example.steps.auth.user;
+package org.example.auth.user;
 
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.example.pojo.auth.AuthRequest;
-import org.example.steps.AbstractTest;
+import org.example.AbstractTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -1,10 +1,10 @@
-package org.example.steps.orders;
+package org.example.orders;
 
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.example.pojo.auth.AuthRequest;
 import org.example.pojo.orders.OrderRequest;
-import org.example.steps.AbstractTest;
+import org.example.AbstractTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

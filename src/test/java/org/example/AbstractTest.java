@@ -1,10 +1,10 @@
-package org.example.steps;
+package org.example;
 
 import com.github.javafaker.Faker;
 import org.example.helpers.OrderGenerator;
 import org.example.helpers.UserGenerator;
-import org.example.steps.steps.AuthSteps;
-import org.example.steps.steps.OrdersSteps;
+import org.example.steps.AuthSteps;
+import org.example.steps.OrdersSteps;
 
 public abstract class AbstractTest {
     public static UserGenerator userGenerator = new UserGenerator();
