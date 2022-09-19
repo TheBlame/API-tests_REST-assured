@@ -1,4 +1,4 @@
-# API-test using REST Assured 
+# API-tests using REST Assured 
 * /src/main/java/org/example/ - helper classes and POJO
 * /src/test/java/org/example/ - tests and Allure steps
 * /target/allure-results/ - Allure report
